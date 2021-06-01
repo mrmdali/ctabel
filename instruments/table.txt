@@ -1,0 +1,47 @@
+construction:
+	name
+	discription
+	date_created
+
+
+positon:
+	name
+	date_created
+
+
+user:
+	username
+	email
+	password
+	password(2)
+	last_login
+	date_created
+
+	is_active
+	is_staff
+	is_superuser
+
+
+header_wokers:
+	user(OneToOne)
+	last_name
+	first_name
+	middle_name
+	image
+	phone
+	construction(FK(construction))
+	dop info FK (Worker)
+
+
+/// header workergayam vaqt qoshish kerak
+/// change log
+sub_wokers:
+	user(OneToOne)
+	last_name
+	first_name
+	middle_name
+	image
+	phone
+	header(FK(header_workers))
+	dismissed
+	dop info FK (Worker)
