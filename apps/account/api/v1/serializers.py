@@ -77,15 +77,14 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 class WorkerDetailSerializer(serializers.ModelSerializer):
     account = AccountUpdateSerializer(required=False, many=False)
-    construction_name = serializers.CharField(source='construction.name', read_only=True)
+    # construction_name = serializers.CharField(source='construction.name', read_only=True)
     position_name = serializers.CharField(source='position.name', read_only=True)
     header_worker_name = serializers.CharField(source='header_worker.get_full_name', read_only=True)
 
     class Meta:
         model = Worker
         fields = ('id', 'first_name', 'last_name', 'middle_name', 'account', 'image', 'phone', 'header_worker_name',
-                  'header_worker', 'construction', 'construction_name', 'position', 'position_name', 'is_header',
-                  'is_dismissed')
+                  'header_worker', 'position', 'position_name', 'is_header', 'is_dismissed')
         extra_kwargs = {
             'account': {
                 'read_only': True,
@@ -101,12 +100,11 @@ class WorkerUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Worker
         fields = ('id', 'first_name', 'last_name', 'middle_name', 'account', 'image', 'phone', 'header_worker',
-                  'header_worker_name', 'construction', 'position', 'is_header', 'is_dismissed')
+                  'header_worker_name', 'position', 'is_header', 'is_dismissed')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
             'header_worker': {'required': False},
-            'construction': {'required': True},
             'position': {'required': True},
         }
 
@@ -130,7 +128,7 @@ class WorkerListSerializer(serializers.ModelSerializer):
     account = AccountRegisterSerializer()
     children = serializers.SerializerMethodField()
     # children = WorkerDetailSerializer(many=True)
-    construction_name = serializers.CharField(source='construction.name', read_only=True)
+    # construction_name = serializers.CharField(source='construction.name', read_only=True)
     position_name = serializers.CharField(source='position.name', read_only=True)
 
     def get_children(self, obj):
@@ -140,5 +138,5 @@ class WorkerListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Worker
-        fields = ('id', 'first_name', 'last_name', 'middle_name', 'account', 'image', 'phone', 'construction',
-                  'construction_name', 'position', 'position_name', 'children', 'is_header', 'is_dismissed')
+        fields = ('id', 'first_name', 'last_name', 'middle_name', 'account', 'image', 'phone',  'position',
+                  'position_name', 'children', 'is_header', 'is_dismissed')

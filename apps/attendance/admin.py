@@ -24,7 +24,8 @@ class WorkingHourAdmin(admin.ModelAdmin):
 
 class AttendanceAdmin(admin.ModelAdmin):
     inlines = (ReasonToNoAttendanceInline, )
-    list_display = ('id', 'header_worker', 'worker', 'checkin', 'checkout', 'working_hours', 'date_modified', 'date_created')
+    list_display = ('id', 'header_worker', 'worker', 'construction', 'checkin', 'checkout', 'working_hours',
+                    'date_modified', 'date_created')
     date_hierarchy = 'date_created'
     list_filter = ('date_created', )
     search_fields = ('header_worker', 'worker')

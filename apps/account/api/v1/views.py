@@ -1,9 +1,12 @@
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+from apps.attendance.models import Attendance
 from .serializers import AccountRegisterSerializer, WorkerListSerializer, WorkerDetailSerializer, \
     WorkerUpdateSerializer, AccountUpdateSerializer, ChangePasswordSerializer, WorkerDismissSerializer
 from ...models import Worker, Account, Position
@@ -70,8 +73,16 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response({'error': e.args})
 
 
-class AllWorkersListView(generics.ListAPIView):
-    # http://127.0.0.1:8000/api/account/v1/all-workers-list/
+class AllActiveWorkersListView(generics.ListAPIView):
+    # http://127.0.0.1:8000/api/account/v1/all-active-workers-list/
+
+    serializer_class = WorkerDetailSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Worker.objects.filter(is_dismissed=False).order_by('-id')
+
+
+class AllInactiveWorkersListView(generics.ListAPIView):
+    # http://127.0.0.1:8000/api/account/v1/all-inactive-workers-list/
 
     serializer_class = WorkerDetailSerializer
     permission_classes = (IsAuthenticated,)
@@ -119,6 +130,20 @@ class WorkerRetrieveUpdateView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return request(status.HTTP_404_NOT_FOUND)
+
+
+class SelfWorkersListView(APIView):
+    # http://127.0.0.1:8000/api/account/v1/self-workers-list/
+
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        qs = Worker.objects.filter(Q(header_worker__account=user) & ~Q(subworkers__date_created__date=timezone.now().date()))
+        if qs:
+            serializer = WorkerDetailSerializer(qs, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class WorkerDismissView(APIView):

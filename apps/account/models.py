@@ -138,9 +138,6 @@ class Worker(models.Model):
                                  null=True, blank=True, limit_choices_to={'status': 0}, related_name='position_workers')
     header_worker = models.ForeignKey('self', related_name='children', on_delete=models.SET_NULL, blank=True,
                                       null=True, db_index=True, limit_choices_to={'is_header': True})
-    construction = models.ForeignKey(Construction, on_delete=models.CASCADE, verbose_name=_('Construction'),
-                                     null=True, blank=True, limit_choices_to={'status': 0},
-                                     related_name='construction_workers')
     # path = models.TextField(null=True, blank=True)
     is_header = models.BooleanField(default=False, verbose_name=_('Is Header'))
     is_dismissed = models.BooleanField(default=False, verbose_name=_('Is Dismissed'))

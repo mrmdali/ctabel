@@ -3,6 +3,8 @@ from django.db import models
 from apps.account.models import Worker
 from django.utils.translation import gettext_lazy as _
 
+from apps.construction.models import Construction
+
 
 class WorkingHour(models.Model):
     class Meta:
@@ -26,6 +28,9 @@ class Attendance(models.Model):
                                       limit_choices_to={'is_header': True}, null=True, related_name='headerworkers')
     worker = models.ForeignKey(Worker, on_delete=models.DO_NOTHING, verbose_name=_('Worker'), null=True, blank=True,
                                related_name='subworkers')
+    construction = models.ForeignKey(Construction, on_delete=models.CASCADE, verbose_name=_('Construction'),
+                                     null=True, blank=True, limit_choices_to={'status': 0},
+                                     related_name='attendances')
     checkin = models.DateTimeField(verbose_name=_('Check in time'), null=True, blank=True)
     checkout = models.DateTimeField(verbose_name=_('Check out time'), null=True, blank=True)
     working_hours = models.FloatField(default=0, verbose_name=_('Working hours'))

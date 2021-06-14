@@ -19,11 +19,12 @@ class WorkingHourSerializer(serializers.ModelSerializer):
 class AttendanceSerializer(serializers.ModelSerializer):
     header_worker_full_name = serializers.CharField(source='header_worker.get_full_name', read_only=True)
     worker_full_name = serializers.CharField(source='worker.get_full_name', read_only=True)
+    construction_name = serializers.CharField(source='construction.name', read_only=True)
 
     class Meta:
         model = Attendance
-        fields = ('id', 'header_worker', 'header_worker_full_name', 'worker', 'worker_full_name', 'checkin',
-                  'checkout', 'working_hours', 'date_modified', 'date_created')
+        fields = ('id', 'header_worker', 'header_worker_full_name', 'worker', 'worker_full_name', 'construction',
+                  'construction_name', 'checkin', 'checkout', 'working_hours', 'date_modified', 'date_created')
         extra_kwargs = {
                 'header_worker': {'required': False},
                 'worker': {'required': True},

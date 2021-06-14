@@ -56,7 +56,8 @@ class AttendanceListCreateView(generics.ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         user = self.request.user
-        attendance = Attendance.objects.filter(header_worker__header_worker__account=user)
+        attendance = Attendance.objects.filter(header_worker__account=user)
+        print(attendance)
         sz = self.get_serializer(attendance, many=True)
         return Response(sz.data, status=status.HTTP_200_OK)
 
@@ -67,14 +68,16 @@ class AttendanceListCreateView(generics.ListCreateAPIView):
         except Exception as e:
             return Response({'error': e.args})
         else:
-            sz = self.get_serializer(data=request.data)
-            if sz.is_valid():
-                if sz.validated_data['worker'] in header_workers:
-                    sz.save(header_worker=user.workers)
-                    return Response(sz.data, status=status.HTTP_201_CREATED)
-                return Response({'error': 'worker is not allowed to the header worker'},
-                                status=status.HTTP_406_NOT_ACCEPTABLE)
-            return Response({'error': 'serializer is not a valid or worker not found'}, status=status.HTTP_409_CONFLICT)
+            for i in request.data:
+                sz = self.get_serializer(data=i)
+                if sz.is_valid():
+                    if sz.validated_data['worker'] in header_workers:
+                        sz.save(header_worker=user.workers)
+                        # return Response(sz.data, status=status.HTTP_201_CREATED)
+                    # return Response({'error': 'worker is not allowed to the header worker'},
+                    #                 status=status.HTTP_406_NOT_ACCEPTABLE)
+                # return Response({'error': 'serializer is not a valid'}, status=status.HTTP_409_CONFLICT)
+            return Response({'success': 'Successfully created'})
 
 
 class AttendanceRUDView(generics.RetrieveUpdateDestroyAPIView):

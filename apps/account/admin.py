@@ -59,10 +59,10 @@ class SubWorkerAdmin(admin.ModelAdmin):
 class WorkerAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'first_name', 'last_name', 'middle_name', 'image_tag', 'account', 'phone', 'position',
-        'header_worker', 'construction', 'is_header', 'is_dismissed', 'date_modified', 'date_created')
+        'header_worker', 'is_header', 'is_dismissed', 'date_modified', 'date_created')
     readonly_fields = ('date_modified', 'date_created')
     search_fields = ('account_username', 'first_name', 'last_name', 'middle_name', 'phone')
-    list_filter = ('date_created', 'position', 'is_header', 'is_dismissed', 'construction')
+    list_filter = ('date_created', 'position', 'is_header', 'is_dismissed')
 
 admin.site.register(Account, AccountAdmin)
 # admin.site.register(HeaderWorker, HeaderWorkerAdmin)
