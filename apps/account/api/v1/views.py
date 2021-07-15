@@ -5,10 +5,13 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken, AuthenticationFailed
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.attendance.models import Attendance
 from .serializers import AccountRegisterSerializer, WorkerListSerializer, WorkerDetailSerializer, \
-    WorkerUpdateSerializer, AccountUpdateSerializer, ChangePasswordSerializer, WorkerDismissSerializer
+    WorkerUpdateSerializer, AccountUpdateSerializer, ChangePasswordSerializer, WorkerDismissSerializer, \
+    WorkerTableListSerializer, TokenGenerateSerializer
 from ...models import Worker, Account, Position
 
 
@@ -24,10 +27,35 @@ class AccountRegisterView(APIView):
                 pk = account.id
                 worker = Worker.objects.get(account_id=pk).id
                 # return Response(serializer.data, status=status.HTTP_201_CREATED)
-                print(HttpResponseRedirect(redirect_to=f'/api/account/v1/worker-detail-update/{worker}/'))
+                # print(HttpResponseRedirect(redirect_to=f'/api/account/v1/worker-detail-update/{worker}/'))
                 return HttpResponseRedirect(redirect_to=f'/api/account/v1/worker-detail-update/{worker}/')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = TokenGenerateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        user = Account.objects.filter(username=self.request.data['username']).first()
+        password = self.request.data['password']
+        if user:
+            if not user.is_active:
+                return Response({'message': 'The user is not a active'})
+        else:
+            raise AuthenticationFailed('User not found')
+
+        if not user.check_password(password):
+            raise AuthenticationFailed('Incorrect password')
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+        else:
+            data = serializer.validated_data
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class AccountDetailUpdateView(APIView):
@@ -78,7 +106,17 @@ class AllActiveWorkersListView(generics.ListAPIView):
 
     serializer_class = WorkerDetailSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Worker.objects.filter(is_dismissed=False).order_by('-id')
+    queryset = Worker.objects.filter(is_dismissed=False)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception as e:
+                return []
+        return queryset
 
 
 class AllInactiveWorkersListView(generics.ListAPIView):
@@ -86,7 +124,17 @@ class AllInactiveWorkersListView(generics.ListAPIView):
 
     serializer_class = WorkerDetailSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Worker.objects.filter(is_dismissed=False).order_by('-id')
+    queryset = Worker.objects.filter(is_dismissed=False)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception as e:
+                return []
+        return queryset
 
 
 class DismissedWorkersListView(generics.ListAPIView):
@@ -94,7 +142,17 @@ class DismissedWorkersListView(generics.ListAPIView):
 
     serializer_class = WorkerDetailSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Worker.objects.filter(is_dismissed=True).order_by('-id')
+    queryset = Worker.objects.filter(is_dismissed=True)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception as e:
+                return []
+        return queryset
 
 
 class WorkerListView(generics.ListAPIView):
@@ -102,7 +160,41 @@ class WorkerListView(generics.ListAPIView):
 
     serializer_class = WorkerListSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Worker.objects.filter(Q(is_header=True) & Q(is_dismissed=False)).order_by('-id')
+    queryset = Worker.objects.filter(Q(is_header=True) & Q(is_dismissed=False))
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception as e:
+                return []
+        return queryset
+
+
+class WorkerTableListView(generics.ListAPIView):
+    # http://127.0.0.1:8000/api/account/v1/worker-table-list/
+
+    serializer_class = WorkerTableListSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = Worker.objects.filter(Q(is_header=True) & Q(is_dismissed=False))
+        if queryset:
+            return queryset
+        return Response({'message': 'Queryset does not exist'})
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if queryset:
+            try:
+                serializer = self.get_serializer(queryset, many=True, context={'request': request})
+                return Response(serializer.data)
+            except Exception as e:
+                return Response({'message': e.args})
+        else:
+            return Response({'message': 'queryset is an empty'})
 
 
 class WorkerRetrieveUpdateView(APIView):
@@ -142,8 +234,9 @@ class SelfWorkersListView(APIView):
         qs = Worker.objects.filter(Q(header_worker__account=user) & ~Q(subworkers__date_created__date=timezone.now().date()))
         if qs:
             serializer = WorkerDetailSerializer(qs, many=True)
+            # serializer.data['success'] = True
             return Response(serializer.data, status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': False, 'message': 'The worker has no sub workers'})
 
 
 class WorkerDismissView(APIView):

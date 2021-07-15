@@ -10,8 +10,4 @@ urlpatterns = [
     path('reason-list/', views.ReasonListView.as_view()),
     path('reason-create/', views.ReasonCreateView.as_view()),
     path('reason-rud/<int:pk>/', views.ReasonRUDView.as_view()),
-    path('no-attendance-all-list/', views.ReasonToNoAttendanceAllListView.as_view()),
-    path('no-attendance-self-list/', views.ReasonToNoAttendanceSelfListView.as_view()),
-    path('no-attendance-self-create/', views.ReasonToNoAttendanceSelfCreateListView.as_view()),
-    path('no-attendance-rud/<int:pk>/', views.ReasonToNoAttendanceRUDView.as_view()),
 ]

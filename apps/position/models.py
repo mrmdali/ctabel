@@ -11,6 +11,7 @@ class Position(models.Model):
     class Meta:
         verbose_name = _('Position')
         verbose_name_plural = _('Positions')
+        ordering = ('name', )
 
     name = models.CharField(max_length=100, verbose_name=_('Position name'))
     description = models.TextField(verbose_name=_('Description position'), null=True, blank=True)

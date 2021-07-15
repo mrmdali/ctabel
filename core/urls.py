@@ -24,12 +24,13 @@ from rest_framework.documentation import include_docs_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api-auth', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 
     path('api/account/', include('apps.account.api.urls')),
     path('api/construction/', include('apps.construction.api.urls')),
     path('api/attendance/', include('apps.attendance.api.urls')),
     path('api/position/', include('apps.position.api.urls')),
+    path('api/terminal/', include('apps.terminal.api.urls')),
 
     path('api/docs/', include_docs_urls(title='Citynet tabel Documentation'))
 ]

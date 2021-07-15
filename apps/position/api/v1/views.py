@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -9,16 +10,36 @@ from apps.position.models import Position
 
 class PositionListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/position/v1/position-list/
-    queryset = Position.objects.filter(status=0).order_by('-id')
+    queryset = Position.objects.filter(status=0)
     serializer_class = PositionSerializer
     permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class PositionInactiveListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/position/v1/position-inactive-list/
-    queryset = Position.objects.filter(status=1).order_by('-id')
+    queryset = Position.objects.filter(status=1)
     serializer_class = PositionSerializer
     permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class PositionCreateView(generics.CreateAPIView):
@@ -49,11 +70,12 @@ class PositionDeleteView(APIView):
             return Response({'error': e.args})
         else:
             if qs.position_workers.count() == 0:
+                print(qs.position_workers.count())
                 serializer = PositionSerializer(qs, data=request.data)
                 if serializer.is_valid():
                     serializer.save(status=1)
-                    return Response('Successfully deleted')
-                return Response('Serializer is not a valid')
+                    return Response({'success': 'Successfully deleted'})
+                return Response({'error': 'Serializer is not a valid', 'sz_errors': serializer.errors})
             return Response({'error': 'the position has workers'})
 
 

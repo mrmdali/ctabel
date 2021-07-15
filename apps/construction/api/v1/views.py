@@ -11,25 +11,66 @@ from ...models import Construction, Object
 class ObjectListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/object-list/
 
-    queryset = Object.objects.order_by('-id')
+    queryset = Object.objects.all()
     serializer_class = ObjectSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.get_queryset()
+    #     if queryset:
+    #         try:
+    #             serializer = self.serializer_class(queryset, many=True)
+    #             return Response(serializer.data)
+    #         except Exception as e:
+    #             return Response({'message': e.args})
+    #     else:
+    #         return Response({'message': 'queryset does not exist'})
 
 
 class ObjectActiveListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/object-list-active/
 
-    queryset = Object.objects.filter(status=0).order_by('-id')
+    queryset = Object.objects.filter(status=0)
     serializer_class = ObjectSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class ObjectInactiveListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/object-list-inactive/
 
-    queryset = Object.objects.filter(status=1).order_by('-id')
+    queryset = Object.objects.filter(status=1)
     serializer_class = ObjectSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class ObjectCreateView(generics.CreateAPIView):
@@ -93,25 +134,55 @@ class ObjectActivateView(APIView):
 class ConstructionListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/construction-list/
 
-    queryset = Construction.objects.order_by('-id')
+    queryset = Construction.objects.all()
     serializer_class = ConstructionSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class ConstructionActiveListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/construction-list-active/
 
-    queryset = Construction.objects.filter(status=0).order_by('-id')
+    queryset = Construction.objects.filter(status=0)
     serializer_class = ConstructionSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class ConstructionInactiveListView(generics.ListAPIView):
     # http://127.0.0.1:8000/api/construction/v1/construction-list-inactive/
 
-    queryset = Construction.objects.filter(status=1).order_by('-id')
+    queryset = Construction.objects.filter(status=1)
     serializer_class = ConstructionSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        param = self.request.GET.get('q')
+        if param:
+            try:
+                queryset = queryset.order_by(param)
+            except Exception:
+                return []
+        return queryset
 
 
 class ConstructionCreateView(generics.CreateAPIView):

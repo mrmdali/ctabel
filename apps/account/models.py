@@ -66,6 +66,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return True  # does user have permission to view the app 'app_label'?
 
 
+'''
 class HeaderWorker(models.Model):
     class Meta:
         verbose_name = _('Header worker')
@@ -120,12 +121,14 @@ class SubWorker(models.Model):
             return mark_safe(f'<a href="{self.image.url}"><img src="{self.image.url}" style="height:50px;"/></a>')
         else:
             return 'Image not found'
+'''
 
 
 class Worker(models.Model):
     class Meta:
         verbose_name = _('Worker')
         verbose_name_plural = _(' Workers')
+        ordering = ('last_name', )
 
     first_name = models.CharField(max_length=50, verbose_name=_('First name'), blank=True)
     last_name = models.CharField(max_length=50, verbose_name=_('Last name'), blank=True)
@@ -138,7 +141,6 @@ class Worker(models.Model):
                                  null=True, blank=True, limit_choices_to={'status': 0}, related_name='position_workers')
     header_worker = models.ForeignKey('self', related_name='children', on_delete=models.SET_NULL, blank=True,
                                       null=True, db_index=True, limit_choices_to={'is_header': True})
-    # path = models.TextField(null=True, blank=True)
     is_header = models.BooleanField(default=False, verbose_name=_('Is Header'))
     is_dismissed = models.BooleanField(default=False, verbose_name=_('Is Dismissed'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Modified date'))

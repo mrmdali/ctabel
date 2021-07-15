@@ -6,8 +6,8 @@ from django.db import models
 from django.forms import TextInput, Select
 from .models import (
     Account,
-    HeaderWorker,
-    SubWorker,
+    # HeaderWorker,
+    # SubWorker,
     Worker
 )
 
@@ -28,6 +28,7 @@ class AccountAdmin(UserAdmin):
     search_fields = ('username', 'email')
 
 
+'''
 class SubWorkerInline(nested_admin.NestedTabularInline):
     model = SubWorker
     extra = 0
@@ -54,6 +55,7 @@ class SubWorkerAdmin(admin.ModelAdmin):
     readonly_fields = ('date_modified', 'date_created')
     search_fields = ('account_username', 'first_name', 'last_name', 'middle_name', 'phone')
     list_filter = ('date_created', 'position', 'header_worker__construction')
+'''
 
 
 class WorkerAdmin(admin.ModelAdmin):
@@ -63,6 +65,8 @@ class WorkerAdmin(admin.ModelAdmin):
     readonly_fields = ('date_modified', 'date_created')
     search_fields = ('account_username', 'first_name', 'last_name', 'middle_name', 'phone')
     list_filter = ('date_created', 'position', 'is_header', 'is_dismissed')
+    autocomplete_fields = ('account', )
+
 
 admin.site.register(Account, AccountAdmin)
 # admin.site.register(HeaderWorker, HeaderWorkerAdmin)

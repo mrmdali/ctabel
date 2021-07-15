@@ -16,6 +16,7 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'apps.construction',
     'apps.attendance',
     'apps.position',
+    'apps.terminal',
 ]
 
 GRAPH_MODELS = {
@@ -201,3 +203,8 @@ STATIC_ROOT = [
     BASE_DIR / 'static'
 ]
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

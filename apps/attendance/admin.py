@@ -3,12 +3,12 @@ from .models import (
     WorkingHour,
     Attendance,
     Reason,
-    ReasonToNoAttendance,
 )
 from django.db import models
 from django.forms import Textarea
 
 
+'''
 class ReasonToNoAttendanceInline(admin.TabularInline):
     model = ReasonToNoAttendance
     extra = 0
@@ -16,6 +16,7 @@ class ReasonToNoAttendanceInline(admin.TabularInline):
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'style': 'height: 70px'})},
     }
+'''
 
 
 class WorkingHourAdmin(admin.ModelAdmin):
@@ -23,12 +24,31 @@ class WorkingHourAdmin(admin.ModelAdmin):
 
 
 class AttendanceAdmin(admin.ModelAdmin):
-    inlines = (ReasonToNoAttendanceInline, )
-    list_display = ('id', 'header_worker', 'worker', 'construction', 'checkin', 'checkout', 'working_hours',
-                    'date_modified', 'date_created')
+    # inlines = (ReasonToNoAttendanceInline, )
+    list_display = ('id', 'header_worker', 'worker', 'get_position', 'construction', 'checkin', 'checkout', 'working_hours',
+                    'reason', 'date_modified', 'date_created')
+    fieldsets = (
+        ('Main info', {
+            'fields': (('header_worker', 'worker', 'construction'), )
+        }),
+        ('Attendance info', {
+            'fields': (('working_hours', 'checkin', 'checkout', 'mark'),)
+        }),
+        ('Reason info', {
+            'fields': (('reason', 'context'),)
+        }),
+        ('Times info', {
+            'fields': (('date_modified', 'date_created'),)
+        }),
+
+    )
     date_hierarchy = 'date_created'
-    list_filter = ('date_created', )
+    readonly_fields = ('date_modified',)
+    list_filter = ('date_created', 'reason')
     search_fields = ('header_worker', 'worker')
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'style': 'height: 20px; width: 400px'})},
+    }
 
 
 class ReasonAdmin(admin.ModelAdmin):
@@ -38,14 +58,15 @@ class ReasonAdmin(admin.ModelAdmin):
     search_fields = ('reason', )
 
 
+'''
 class ReasonToNoAttendanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'attendance', 'reason', 'date_modified', 'date_created')
     date_hierarchy = 'date_created'
     search_fields = ('attendance', )
     list_filter = ('date_created', 'reason')
+'''
 
 
 admin.site.register(WorkingHour, WorkingHourAdmin)
-admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(Reason, ReasonAdmin)
-admin.site.register(ReasonToNoAttendance, ReasonToNoAttendanceAdmin)
+admin.site.register(Attendance, AttendanceAdmin)

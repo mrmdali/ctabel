@@ -7,14 +7,13 @@ from .serializers import (
     WorkingHourSerializer,
     AttendanceSerializer,
     ReasonSerializer,
-    ReasonToNoAttendanceListSerializer, ReasonToNoAttendanceCreateSerializer, ReasonToNoAttendanceDetailSerializer
 )
 from ...models import (
     WorkingHour,
     Attendance,
     Reason,
-    ReasonToNoAttendance,
 )
+
 from rest_framework import generics, status
 from rest_framework.permissions import (
     IsAuthenticated,
@@ -57,7 +56,6 @@ class AttendanceListCreateView(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         user = self.request.user
         attendance = Attendance.objects.filter(header_worker__account=user)
-        print(attendance)
         sz = self.get_serializer(attendance, many=True)
         return Response(sz.data, status=status.HTTP_200_OK)
 
@@ -74,9 +72,13 @@ class AttendanceListCreateView(generics.ListCreateAPIView):
                     if sz.validated_data['worker'] in header_workers:
                         sz.save(header_worker=user.workers)
                         # return Response(sz.data, status=status.HTTP_201_CREATED)
-                    # return Response({'error': 'worker is not allowed to the header worker'},
-                    #                 status=status.HTTP_406_NOT_ACCEPTABLE)
-                # return Response({'error': 'serializer is not a valid'}, status=status.HTTP_409_CONFLICT)
+                    else:
+                        return Response({'error': 'worker is not allowed to the header worker',
+                            'serializer_error': sz.errors},
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
+                else:
+                    return Response({'error': 'serializer is not a valid', 'serializer_error': sz.errors}, 
+                        status=status.HTTP_409_CONFLICT)
             return Response({'success': 'Successfully created'})
 
 
@@ -152,6 +154,7 @@ class ReasonRUDView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAdminUser, )
 
 
+'''
 class ReasonToNoAttendanceAllListView(APIView):
     # http://127.0.0.1:8000/api/attendance/v1/no-attendance-all-list/
 
@@ -190,22 +193,38 @@ class ReasonToNoAttendanceSelfCreateListView(generics.CreateAPIView):
     # http://127.0.0.1:8000/api/attendance/v1/no-attendance-self-create/
 
     serializer_class = ReasonToNoAttendanceCreateSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def create(self, request, *args, **kwargs):
         try:
             user_id = request.user.id
             header_worker = Worker.objects.filter(header_worker__account_id=user_id)
-            sz = self.serializer_class(data=request.data, context={"request": self.request})
         except Exception as e:
             return Response({'error': e.args})
         else:
-            if sz.is_valid():
-                if sz.validated_data['attendance']['worker'] in header_worker:
-                    sz.save()
-                    return Response(sz.data, status=status.HTTP_201_CREATED)
-                return Response({'error': 'worker is not allowed to the header worker'})
-            return Response('Something get wrong, values not a valid')
+            # sz = self.serializer_class(data=request.data, context={"request": self.request})
+            # if sz.is_valid():
+            #     if sz.validated_data['attendance']['worker'] in header_worker:
+            #         sz.save()
+            #         return Response(sz.data, status=status.HTTP_201_CREATED)
+            #     return Response({'error': 'worker is not allowed to the header worker'})
+            # return Response('Something get wrong, values not a valid')
+
+            for i in request.data: 
+                print(i)
+                sz = self.get_serializer(data=i, context={"request": self.request})
+                if sz.is_valid():
+                    print('valid')
+                    if sz.validated_data['attendance']['worker'] in header_worker:
+                        sz.save()
+                        # return Response(sz.data, status=status.HTTP_201_CREATED)
+                    else:
+                        return Response({'error': 'worker is not allowed to the header worker', 
+                            'serializer_error': sz.errors})
+                else:
+                    return Response({'error':'Something get wrong, values not a valid', 
+                        'serializer_error': sz.errors})
+            return Response({'success': 'Successfully created'})
 
 
 class ReasonToNoAttendanceRUDView(generics.RetrieveUpdateDestroyAPIView):
@@ -254,5 +273,5 @@ class ReasonToNoAttendanceRUDView(generics.RetrieveUpdateDestroyAPIView):
             return Response({'error': 'query is not match for the header worker'})
         except Exception as e:
             return Response({'error': e.args})
-
+'''
 

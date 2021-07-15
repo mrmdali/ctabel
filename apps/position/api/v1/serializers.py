@@ -8,6 +8,11 @@ class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Position
         fields = ('id', 'name', 'status', 'description', 'date_created')
+        extra_kwargs = {
+            'name': {
+                'required': False
+            }
+        }
 
     def get_status(self, obj):
         return obj.get_status_display()

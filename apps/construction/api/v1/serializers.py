@@ -26,6 +26,7 @@ class ObjectDetailSerializer(serializers.ModelSerializer):
 
 class ConstructionSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
+    object = serializers.CharField(source='object.name')
 
     class Meta:
         model = Construction
