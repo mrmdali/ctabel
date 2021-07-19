@@ -21,11 +21,12 @@ class ReasonSerializer(serializers.ModelSerializer):
 class AttendanceTableSerializer(serializers.ModelSerializer):
     construction_name = serializers.CharField(source='construction.name', read_only=True)
     reason_name = serializers.CharField(source='reason.reason', read_only=True)
+    short_name = serializers.CharField(source='reason.short_name', read_only=True)
 
     class Meta:
         model = Attendance
         fields = ('id', 'construction_name', 'checkin', 'checkout', 'working_hours', 'reason_name',
-                  'date_modified', 'date_created')
+                  'short_name', 'date_modified', 'date_created')
 
 
 class AttendanceSerializer(serializers.ModelSerializer):

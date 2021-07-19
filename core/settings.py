@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'apps.construction',
     'apps.attendance',
     'apps.position',
-    'apps.terminal',
+    # 'apps.terminal',
 ]
 
 GRAPH_MODELS = {

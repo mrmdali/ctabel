@@ -135,7 +135,7 @@ class Worker(models.Model):
     middle_name = models.CharField(max_length=50, verbose_name=_('Middle name'), blank=True)
     account = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Account'),
                                    related_name='workers', blank=True)
-    image = models.ImageField(upload_to='workers/profile_image', verbose_name=_('Profile image'), blank=True)
+    image = models.ImageField(upload_to='workers/profile_image', verbose_name=_('Profile image'), blank=True, null=True)
     phone = models.CharField(max_length=16, verbose_name=_('Phone Number'), blank=True)
     position = models.ForeignKey(Position, on_delete=models.CASCADE, verbose_name=_('worker position'),
                                  null=True, blank=True, limit_choices_to={'status': 0}, related_name='position_workers')

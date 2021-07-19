@@ -26,11 +26,17 @@ class ObjectDetailSerializer(serializers.ModelSerializer):
 
 class ConstructionSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
-    object = serializers.CharField(source='object.name')
+    object_name = serializers.CharField(source='object.name', read_only=True)
 
     class Meta:
         model = Construction
-        fields = ('id', 'object', 'name', 'status', 'description', 'date_created')
+        fields = ('id', 'object', 'object_name', 'name', 'status', 'description', 'date_created')
+        extra_kwargs = {
+             'support': {
+                'read_only': False,
+                'required': True
+            }
+        }
 
     def get_status(self, obj):
         return obj.get_status_display()

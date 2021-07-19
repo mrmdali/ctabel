@@ -214,7 +214,7 @@ class WorkerRetrieveUpdateView(APIView):
     def put(self, request, pk, *args, **kwargs):
         # user = self.request.user
         # qs = Worker.objects.get(account=user)
-        qs = Worker.objects.get(Q(id=pk) & Q(is_dismissed=False))
+        qs = Worker.objects.get(id=pk)
         if qs:
             serializer = WorkerUpdateSerializer(qs, data=request.data)
             if serializer.is_valid():
@@ -236,7 +236,7 @@ class SelfWorkersListView(APIView):
             serializer = WorkerDetailSerializer(qs, many=True)
             # serializer.data['success'] = True
             return Response(serializer.data, status.HTTP_200_OK)
-        return Response({'success': False, 'message': 'The worker has no sub workers'})
+        return []
 
 
 class WorkerDismissView(APIView):
