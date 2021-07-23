@@ -236,7 +236,7 @@ class SelfWorkersListView(APIView):
             serializer = WorkerDetailSerializer(qs, many=True)
             # serializer.data['success'] = True
             return Response(serializer.data, status.HTTP_200_OK)
-        return []
+        return Response({'success': False, 'message': 'The worker has no sub workers'})
 
 
 class WorkerDismissView(APIView):
